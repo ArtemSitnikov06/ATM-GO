@@ -1,0 +1,265 @@
+﻿openapi: 3.0.0
+info:
+  title: ATM Api
+  version: 1.0.0
+  description: API
+
+servers:
+  - url: http://localhost:8080
+    description: Production server
+
+tags:
+  - name: Users
+    description: Управление пользователями
+  - name: Bills
+    description: Управление счетами
+
+
+paths:
+  /api/users:
+    post:
+      tags:
+        - Users
+      summary: Создание нового пользователя
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUser'
+      responses:
+        '200':
+          description: Пользователь успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+    get:
+      tags:
+        - Users
+      summary: Получение всех пользователей
+      responses:
+        '200':
+          description: Список всех пользователей получен
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Users"
+        '404':
+          description: Не удалось получить список пользователей
+
+  /api/users/{login}:
+    get:
+      tags:
+        - Users
+      summary: Получение пользователя по логину
+      parameters:
+        - name: login
+          in: path
+          required: true
+          description: Логин пользователя
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Пользователь найден по логину
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '404':
+          description: Пользователь с таким логином не найден
+    delete:
+      tags:
+        - Users
+      summary: Удаление пользователя по логину
+      parameters:
+        - name: login
+          in: path
+          required: true
+          description: Логин пользователя
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Пользователь успешно удален
+        '404':
+          description: Пользователь с таким логином не найден
+        '500':
+          description: Не удалось удалить пользователя
+  /api/users/login:
+    put:
+      tags:
+        - Users
+      summary: Изменение логина пользователя
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangeLogin"
+      responses:
+        '200':
+          description: Успешное изменение пользовтеля
+        '404':
+          description: Пользователь не найден
+        '500':
+          description: Не удалось изменить логин
+  /api/bills:
+    post:
+      tags:
+        - Bills
+      summary: Создание счета
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewBill"
+      responses:
+        '200':
+          description: Успешное создание счета
+        '404':
+          description: Пользователь с таким логином не найден
+        '500':
+          description: Не удалось создать счет
+  /api/bills/deposit:
+    post:
+      tags:
+        - Bills
+      summary: Пополнение счета
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Operation"
+      responses:
+        '200':
+          description: Успешное пополнение
+        '404':
+          description: Счет не найден
+  /api/bills/withdraw:
+    post:
+      tags:
+        - Bills
+      summary: Снятие денег со счета
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Operation"
+      responses:
+        '200':
+          description: Успешное пополнение
+        '404':
+          description: Счет не найден
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+components:
+  schemas:
+    ChangeLogin:
+      type: object
+      properties:
+        oldLogin:
+          type: string
+        newLogin:
+          type: string
+      required:
+        - oldLogin
+        - newLogin
+    NewUser:
+      type: object
+      properties:
+        login:
+          type: string
+        name:
+          type: string
+        age:
+          type: integer
+        hairColor:
+          type: string
+          enum:
+            - Blond
+            - Red
+        gender:
+          type: string
+          enum:
+            - Male
+            - Female
+      required:
+        - id
+        - login
+        - name
+        - age
+        - hairColor
+        - gender
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        login:
+          type: string
+        name:
+          type: string
+        age:
+          type: integer
+        hairColor:
+          type: string
+          enum:
+            - Blond
+            - Red
+        gender:
+          type: string
+          enum:
+            - Male
+            - Female
+      required:
+          - id
+          - login
+          - name
+          - age
+          - hairColor
+          - gender
+    Users:
+      type: array
+      items:
+        $ref: "#/components/schemas/UserResponse"
+    NewBill:
+      type: object
+      properties:
+        ownerLogin:
+          type: string
+      required:
+        - ownerLogin
+    Operation:
+      type: object
+      properties:
+        BillID:
+          type: integer
+          format: uint
+        amount:
+          type: number
+          format: double
+      required:
+        - BillID
+        - amount
+
+
+
+
+
